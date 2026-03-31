@@ -4,6 +4,7 @@ import 'package:trying_flutter_app/models/task.dart';
 import 'package:trying_flutter_app/models/task_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
@@ -25,6 +26,7 @@ class _TasksPageState extends State<TasksPage> {
 
   // create a task
   void createTask() {
+    DateTime deadline = DateTime.now();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -47,7 +49,8 @@ class _TasksPageState extends State<TasksPage> {
                   firstDate: DateTime.now(),
                   lastDate: DateTime(2100));
 
-                dateController.text = date == null ? DateTime.now().toIso8601String() : date.toIso8601String();
+                deadline = date == null ? deadline : date;
+                dateController.text = date == null ? DateFormat('dd/MM/yyyy').format(deadline) : DateFormat('dd/MM/yyyy').format(date);
               },
             ),
             TextField(
@@ -62,7 +65,7 @@ class _TasksPageState extends State<TasksPage> {
           MaterialButton(
             onPressed: () {
               // add to db
-              context.read<TaskDatabase>().addTask(textController.text, dateController.text);
+              context.read<TaskDatabase>().addTask(textController.text, deadline);
 
               // clear controller
               textController.clear();
@@ -85,7 +88,9 @@ class _TasksPageState extends State<TasksPage> {
   // update a task
   void updateTask(Task task) {
     textController.text = task.text;
-    dateController.text = task.date;
+    dateController.text = DateFormat('dd/MM/yyyy').format(task.deadlineDate);
+    DateTime deadline = task.deadlineDate;
+
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -105,11 +110,12 @@ class _TasksPageState extends State<TasksPage> {
 
                   date = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.parse(dateController.text),
+                    initialDate: deadline,
                     firstDate: DateTime.now(),
                     lastDate: DateTime(2100));
 
-                  dateController.text = date == null ? DateTime.now().toIso8601String() : date.toIso8601String();
+                  deadline = date == null ? deadline : date;
+                  dateController.text = date == null ? DateFormat('dd/MM/yyyy').format(deadline) : DateFormat('dd/MM/yyyy').format(date);
                 },
               ),
               TextField(
@@ -125,7 +131,7 @@ class _TasksPageState extends State<TasksPage> {
                 onPressed: () {
                   context
                       .read<TaskDatabase>()
-                      .updateTask(task.id, textController.text, dateController.text);
+                      .updateTask(task.id, textController.text, deadline);
                   // clear controller
                   textController.clear();
                   dateController.clear();
@@ -165,6 +171,7 @@ class _TasksPageState extends State<TasksPage> {
             // list tile UI
             return ListTile(
               title: Text(task.text),
+              subtitle: Text("Deadline: " + DateFormat('dd/MM/yyyy').format(task.deadlineDate)),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

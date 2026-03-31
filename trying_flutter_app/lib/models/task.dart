@@ -9,5 +9,5 @@ part 'task.g.dart';
 class Task {
   Id id = Isar.autoIncrement;
   late String text;
-  late String date;
+  late DateTime deadlineDate;
 }

@@ -24,11 +24,11 @@ class TaskDatabase extends ChangeNotifier{
   final List<Task> currentTasks = [];
 
   // create
-  Future<void> addTask(String textFromUser, String dateFromUser) async {
+  Future<void> addTask(String textFromUser, DateTime dateFromUser) async {
     // create a new object
     late Task newTask = Task();
     newTask.text = textFromUser;
-    newTask.date = dateFromUser;
+    newTask.deadlineDate = dateFromUser;
 
     // save to db
     await isar.writeTxn(() => isar.tasks.put(newTask));
@@ -46,11 +46,11 @@ class TaskDatabase extends ChangeNotifier{
   }
 
   // update
-  Future<void> updateTask(int id, String newText, String newDate) async {
+  Future<void> updateTask(int id, String newText, DateTime newDate) async {
     final existingTask = await isar.tasks.get(id);
     if (existingTask != null) {
       existingTask.text = newText;
-      existingTask.date = newDate;
+      existingTask.deadlineDate = newDate;
       await isar.writeTxn(() => isar.tasks.put(existingTask));
       await fetchTasks();
     }
