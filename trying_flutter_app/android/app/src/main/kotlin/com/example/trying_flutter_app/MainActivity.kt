@@ -1,4 +1,4 @@
-package com.example.trying_flutter_app
+package com.example.thingyminder
 
 import io.flutter.embedding.android.FlutterActivity
 

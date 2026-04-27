@@ -9,6 +9,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _displayNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -32,10 +33,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
+
+      await userCredential.user?.updateDisplayName(_displayNameController.text);
+
       navigateLogin();
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -63,6 +67,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 48),
               Icon(Icons.lock_outline, size: 100, color: Colors.blue[200]),
               const SizedBox(height: 48),
+              TextField(
+                controller: _displayNameController,
+                decoration: const InputDecoration(label: Text('Username')),
+              ),
               TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(label: Text('Email')),

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "442073850832",
-    "project_id": "testing-firebasexflutter",
-    "storage_bucket": "testing-firebasexflutter.firebasestorage.app"
+    "project_number": "1059764051920",
+    "project_id": "midtermexam-thingyminder",
+    "storage_bucket": "midtermexam-thingyminder.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:442073850832:android:bdf8a72499f67ad66e4fd5",
+        "mobilesdk_app_id": "1:1059764051920:android:3fe981d463e51509db63d5",
         "android_client_info": {
-          "package_name": "com.example.trying_flutter_app"
+          "package_name": "com.example.thingyminder"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBC9A0PlQofzGyypiLOSOUUX7tngg782Oc"
+          "current_key": "AIzaSyAJsdpYc-PXBUEutjmFn0w-g74PgeVrovs"
         }
       ],
       "services": {

@@ -2,34 +2,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService{
 
-  final CollectionReference notes = FirebaseFirestore.instance.collection('notes');
+  final CollectionReference events = FirebaseFirestore.instance.collection('events');
 
   //create new note
-  Future<void> addNote(String title, String content) {
-    return notes.add({
+  Future<void> addEvent(String? userUid, String title, String content, DateTime? eventDate, String? imagePublicId){
+    return events.add({
+      'userUid': userUid,
       'title': title,
       'content': content,
+      'eventDate': eventDate != null ? Timestamp.fromDate(eventDate) : null,
+      'imagePublicId': imagePublicId,
+      'createdAt': Timestamp.now()
+    });
+  }
+
+  //fetch events by user id
+  Stream<QuerySnapshot> getEvents(String? userUid) {
+    return events.where('userUid', isEqualTo: userUid).orderBy('createdAt', descending: true).snapshots();
+  }
+
+  //update events
+  Future<void> updateEvent(String id, String title, String content, DateTime? eventDate, String? imagePublicId){
+    return events.doc(id).update({
+      'title': title,
+      'content': content,
+      'eventDate': eventDate != null ? Timestamp.fromDate(eventDate) : null,
+      'imagePublicId': imagePublicId,
       'createdAt': Timestamp.now(),
     });
   }
 
-  //fetch all notes
-  Stream<QuerySnapshot> getNotes() {
-    return notes.orderBy('createdAt', descending: true).snapshots();
-  }
-
-  //update notes
-  Future<void> updateNote(String id, String title, String content) {
-    return notes.doc(id).update({
-      'title': title,
-      'content': content,
-      'createdAt': Timestamp.now(),
-    });
-  }
-
-  //delete notes
-  Future<void> deleteNote(String id) {
-    return notes.doc(id).delete();
+  //delete events
+  Future<void> deleteEvent(String id) {
+    return events.doc(id).delete();
   }
 
 }
