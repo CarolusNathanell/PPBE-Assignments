@@ -14,7 +14,7 @@ void main() async {
   );
   
   await AwesomeNotifications().initialize(
-    null, // null = default app icon
+    null,
     [
       NotificationChannel(
         channelKey: 'events_channel',
