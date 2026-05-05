@@ -122,11 +122,11 @@ List<Map<String, dynamic>> _getEventsForDay(
                       ),
                       // Add event button for this specific day
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline),
+                        icon: const Icon(CupertinoIcons.add_circled),
                         onPressed: () {
-                          Navigator.pop(context); // close sheet first
+                          Navigator.pop(context);
                           selectedEventDate = day;
-                          openEventBox(userUid: userUid);
+                          openEventBox(userUid: userUid, existingDate: selectedEventDate);
                         },
                       ),
                     ],
@@ -187,7 +187,7 @@ List<Map<String, dynamic>> _getEventsForDay(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         IconButton(
-                                          icon: const Icon(Icons.edit),
+                                          icon: const Icon(CupertinoIcons.pencil),
                                           onPressed: () {
                                             Navigator.pop(context);
                                             openEventBox(
@@ -200,7 +200,7 @@ List<Map<String, dynamic>> _getEventsForDay(
                                           },
                                         ),
                                         IconButton(
-                                          icon: const Icon(Icons.delete),
+                                          icon: const Icon(CupertinoIcons.delete),
                                           onPressed: () {
                                             firestoreService.deleteEvent(docId);
                                             Navigator.pop(context);
@@ -456,7 +456,7 @@ List<Map<String, dynamic>> _getEventsForDay(
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () => openEventBox(userUid: userUid),
-              child: const Icon(Icons.add),
+              child: const Icon(CupertinoIcons.add_circled),
             ),
             body: StreamBuilder<QuerySnapshot>(
               stream: firestoreService.getEvents(userUid),
