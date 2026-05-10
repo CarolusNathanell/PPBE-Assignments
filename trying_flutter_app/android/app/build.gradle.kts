@@ -14,9 +14,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17"
     }
 
     defaultConfig {
@@ -24,7 +23,7 @@ android {
         applicationId = "com.example.trying_flutter_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -37,6 +36,16 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("com.google.ai.edge.litert:litert:1.4.2")
+        force("com.google.ai.edge.litert:litert-api:1.4.2")
+    }
+    exclude(group = "org.tensorflow", module = "tensorflow-lite")
+    exclude(group = "org.tensorflow", module = "tensorflow-lite-api")
+    exclude(group = "org.tensorflow", module = "tensorflow-lite-gpu")
 }
 
 flutter {

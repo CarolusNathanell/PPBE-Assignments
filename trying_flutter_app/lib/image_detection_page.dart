@@ -1,34 +1,15 @@
-// image_detection_page.dart
-// Static image breed classifier — for testing model accuracy
-// without camera interference
-//
-// Dependencies (pubspec.yaml):
-//   tflite_flutter: ^0.10.4+1
-//   image: ^4.1.3
-//   image_picker: ^1.0.7
-//
-// Assets:
-//   assets/models/pet_breed_model_with_metadata.tflite
-//   assets/models/labels.txt
-
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
-// ─────────────────────────────────────────────────────────────
-// Isolate inference — same as live screen but isolated here
-// ─────────────────────────────────────────────────────────────
+// Isolate inference
 Future<List<MapEntry<String, double>>> _runImageInference(
     Map<String, dynamic> args) async {
   final bytes      = args['bytes']      as Uint8List;
   final labels     = args['labels']     as List<String>;
   final modelBytes = args['modelBytes'] as Uint8List;
-  final useNeg1to1 = args['useNeg1to1'] as bool;
 
   final decoded = img.decodeImage(bytes);
   if (decoded == null) return [];
@@ -41,21 +22,11 @@ Future<List<MapEntry<String, double>>> _runImageInference(
       224,
       (y) => List.generate(224, (x) {
         final pixel = resized.getPixel(x, y);
-        if (useNeg1to1) {
-          // MobileNetV2 default: [-1, 1]
-          return [
-            (pixel.r / 127.5) - 1.0,
-            (pixel.g / 127.5) - 1.0,
-            (pixel.b / 127.5) - 1.0,
-          ];
-        } else {
-          // Manual normalization: [0, 1]
-          return [
-            pixel.r / 255.0,
-            pixel.g / 255.0,
-            pixel.b / 255.0,
-          ];
-        }
+        return [
+          pixel.r / 255.0,
+          pixel.g / 255.0,
+          pixel.b / 255.0,
+        ];
       }),
     ),
   );
@@ -72,12 +43,10 @@ Future<List<MapEntry<String, double>>> _runImageInference(
       MapEntry(labels[i], probs[i]))
     ..sort((a, b) => b.value.compareTo(a.value));
 
-  return ranked.take(10).toList(); // top 10
+  return ranked.take(10).toList();
 }
 
-// ─────────────────────────────────────────────────────────────
 // Page
-// ─────────────────────────────────────────────────────────────
 class ImageDetectionPage extends StatefulWidget {
   const ImageDetectionPage({super.key});
 
@@ -92,7 +61,6 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
   List<MapEntry<String, double>>  _results    = [];
   bool                            _isLoading  = false;
   String                          _status     = 'Pick an image to classify';
-  bool                            _useNeg1to1 = true; // toggle preprocessing
 
   // ── Model assets ───────────────────────────────────────────
   Uint8List?   _modelBytes;
@@ -121,7 +89,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
           .toList();
 
       final modelData = await DefaultAssetBundle.of(context)
-          .load('assets/models/pet_breed_model_with_metadata.tflite');
+          .load('assets/models/pet_breed_model.tflite');
       _modelBytes = modelData.buffer.asUint8List();
 
       setState(() {
@@ -138,7 +106,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
     try {
       final picked = await _picker.pickImage(
         source: source,
-        imageQuality: 100,   // no compression — we want raw pixels
+        imageQuality: 100,
       );
       if (picked == null) return;
 
@@ -168,7 +136,6 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
         'bytes':      _imageBytes!,
         'labels':     _labels,
         'modelBytes': _modelBytes!,
-        'useNeg1to1': _useNeg1to1,
       });
 
       setState(() {
@@ -196,38 +163,11 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
           'Image Breed Classifier',
           style: TextStyle(color: Colors.white),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          // Preprocessing toggle — key for debugging mismatch
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Row(
-              children: [
-                Text(
-                  _useNeg1to1 ? '[-1,1]' : '[0,1]',
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 12),
-                ),
-                Switch(
-                  value: _useNeg1to1,
-                  activeColor: Colors.greenAccent,
-                  onChanged: (val) {
-                    setState(() {
-                      _useNeg1to1 = val;
-                      _results    = [];       // clear old results
-                      _status     = 'Preprocessing changed — re-classify';
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
+        iconTheme: const IconThemeData(color: Colors.white)
       ),
 
       body: Column(
         children: [
-
           // ── Status bar ─────────────────────────────────────
           Container(
             width: double.infinity,
@@ -266,7 +206,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
                 margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: const Color(0xFF16213E),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Colors.white12,
                     width: 1,
@@ -274,10 +214,10 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
                 ),
                 child: _imageBytes != null
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(5),
                         child: Image.memory(
                           _imageBytes!,
-                          fit: BoxFit.contain,
+                          fit: BoxFit.fitWidth,
                         ),
                       )
                     : Column(
@@ -369,12 +309,12 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
                                 horizontal: 12, vertical: 10),
                             decoration: BoxDecoration(
                               color: isTop
-                                  ? Colors.green.withOpacity(0.15)
+                                  ? Colors.green.withAlpha(39)
                                   : const Color(0xFF16213E),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: isTop
-                                    ? Colors.greenAccent.withOpacity(0.5)
+                                    ? Colors.greenAccent.withAlpha(128)
                                     : Colors.white12,
                               ),
                             ),
@@ -471,9 +411,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
 // Helper widget
-// ─────────────────────────────────────────────────────────────
 class _ActionButton extends StatelessWidget {
   final IconData  icon;
   final String    label;
@@ -498,10 +436,10 @@ class _ActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: enabled
               ? const Color(0xFF16213E)
-              : const Color(0xFF16213E).withOpacity(0.4),
+              : const Color(0xFF16213E).withAlpha(102),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: enabled ? color.withOpacity(0.5) : Colors.white12,
+            color: enabled ? color.withAlpha(128) : Colors.white12,
           ),
         ),
         child: Column(
