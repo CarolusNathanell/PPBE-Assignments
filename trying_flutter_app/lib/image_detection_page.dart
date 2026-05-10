@@ -4,7 +4,7 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
-// Isolate inference
+// Isolate inference — same as live screen but isolated here
 Future<List<MapEntry<String, double>>> _runImageInference(
     Map<String, dynamic> args) async {
   final bytes      = args['bytes']      as Uint8List;
@@ -23,9 +23,9 @@ Future<List<MapEntry<String, double>>> _runImageInference(
       (y) => List.generate(224, (x) {
         final pixel = resized.getPixel(x, y);
         return [
-          pixel.r / 255.0,
-          pixel.g / 255.0,
-          pixel.b / 255.0,
+          (pixel.r / 127.5) - 1.0,
+          (pixel.g / 127.5) - 1.0,
+          (pixel.b / 127.5) - 1.0,
         ];
       }),
     ),
@@ -43,7 +43,7 @@ Future<List<MapEntry<String, double>>> _runImageInference(
       MapEntry(labels[i], probs[i]))
     ..sort((a, b) => b.value.compareTo(a.value));
 
-  return ranked.take(10).toList();
+  return ranked.take(10).toList(); // top 10
 }
 
 // Page
@@ -135,7 +135,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
       final results = await compute(_runImageInference, {
         'bytes':      _imageBytes!,
         'labels':     _labels,
-        'modelBytes': _modelBytes!,
+        'modelBytes': _modelBytes!
       });
 
       setState(() {
@@ -160,7 +160,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF16213E),
         title: const Text(
-          'Image Breed Classifier',
+          'Image Cat & Dog Breed Classifier',
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white)
@@ -168,6 +168,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
 
       body: Column(
         children: [
+
           // ── Status bar ─────────────────────────────────────
           Container(
             width: double.infinity,
@@ -203,7 +204,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
             child: GestureDetector(
               onTap: () => _pickImage(ImageSource.gallery),
               child: Container(
-                margin: const EdgeInsets.all(16),
+                margin: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: const Color(0xFF16213E),
                   borderRadius: BorderRadius.circular(12),
@@ -217,7 +218,7 @@ class _ImageDetectionPageState extends State<ImageDetectionPage> {
                         borderRadius: BorderRadius.circular(5),
                         child: Image.memory(
                           _imageBytes!,
-                          fit: BoxFit.fitWidth,
+                          fit: BoxFit.contain,
                         ),
                       )
                     : Column(
@@ -437,7 +438,7 @@ class _ActionButton extends StatelessWidget {
           color: enabled
               ? const Color(0xFF16213E)
               : const Color(0xFF16213E).withAlpha(102),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: enabled ? color.withAlpha(128) : Colors.white12,
           ),
