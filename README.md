@@ -5,8 +5,9 @@ A simple Flutter app that identifies dog and cat breeds from images using a Mobi
 ---
 
 ## App Screenshot
-
-[App Screenshot](app-demo-screenshot.jpeg)
+<p align="center">
+  <img src="app-demo-screenshot.jpeg" height="800" alt="Description">
+</p>
 
 ---
 
