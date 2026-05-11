@@ -1,6 +1,12 @@
 # 🐾 Pet Breed Image Classifier
 
-A simple Flutter app that identifies dog and cat breeds from images using a MobileNetV2 model trained on the Oxford IIIT-Pet dataset (37 breeds).
+A simple Flutter app that identifies dog and cat breeds from images using a MobileNetV2 model trained on the Oxford IIIT-Pet dataset (37 breeds). Made for a mobile programming assignment.
+
+---
+
+## App Screenshot
+
+[App Screenshot](app-demo-screenshot.jpeg)
 
 ---
 
