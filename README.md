@@ -81,6 +81,7 @@ The model was trained on the [Oxford IIIT-Pet Dataset](https://www.robots.ox.ac.
 | Training tool | TensorFlow / Keras (Google Colab) |
 | Export format | TensorFlow Lite with metadata |
 
+---
 ## Known Limitations
 
 - Works best with clear, well-lit images where the pet is the main subject
